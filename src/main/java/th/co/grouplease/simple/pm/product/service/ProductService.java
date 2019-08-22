@@ -10,7 +10,6 @@ import th.co.grouplease.simple.pm.product.ProductRepository;
 import th.co.grouplease.simple.pm.product.command.ChangeProductNameCommand;
 import th.co.grouplease.simple.pm.product.command.ChangeProductTimelineCommand;
 import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
-import th.co.grouplease.simple.pm.product.command.DeleteProductCommand;
 
 import javax.validation.Valid;
 
@@ -28,12 +27,12 @@ public class ProductService {
         );
     }
 
-    public void deleteProduct(@Valid DeleteProductCommand deleteProductCommand) {
-        if(!productRepository.existsById(deleteProductCommand.getProductId())){
+    public void deleteProduct(Long productId) {
+        if(!productRepository.existsById(productId)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
             // Change to soft deleting
-            productRepository.deleteById(deleteProductCommand.getProductId());
+            productRepository.deleteById(productId);
         }
     }
 

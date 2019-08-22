@@ -10,7 +10,6 @@ import org.springframework.web.server.ResponseStatusException;
 import th.co.grouplease.simple.pm.product.command.ChangeProductNameCommand;
 import th.co.grouplease.simple.pm.product.command.ChangeProductTimelineCommand;
 import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
-import th.co.grouplease.simple.pm.product.command.DeleteProductCommand;
 import th.co.grouplease.simple.pm.product.service.ProductService;
 import th.co.grouplease.simple.pm.project.Project;
 import th.co.grouplease.simple.pm.project.ProjectRepository;
@@ -88,18 +87,18 @@ public class ProductController {
         return productService.createProduct(command);
     }
 
-    @PutMapping(path = "/{productId}/")
+    @PutMapping(path = "/{productId}/", produces = "application/change-product-name+command")
     public Product changeProductName(@PathVariable Long productId, @RequestBody @Valid ChangeProductNameCommand command){
         return productService.changeProductName(productId, command);
     }
 
-    @PutMapping(path = "/{productId}/")
+    @PutMapping(path = "/{productId}/", produces = "application/change-product-timeline+command")
     public Product changeProductTimeline(@PathVariable Long productId, @RequestBody @Valid ChangeProductTimelineCommand command){
         return productService.changeProductTimeline(productId, command);
     }
 
     @DeleteMapping(path = "/{productId}")
     public void deleteProduct(@PathVariable Long productId){
-        productService.deleteProduct(new DeleteProductCommand(productId));
+        productService.deleteProduct(productId);
     }
 }
