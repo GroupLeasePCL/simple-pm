@@ -2,11 +2,14 @@ package th.co.grouplease.simple.pm.workinglog;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.time.LocalDate;
+
 public interface ProjectWorkingEntryDto {
     Long getId();
     TypeOfWork getTypeOfWork();
     LightResource getResource();
     LightProject getProject();
+    LocalDate getWorkingDate();
 
     interface LightProject {
         Long getId();
