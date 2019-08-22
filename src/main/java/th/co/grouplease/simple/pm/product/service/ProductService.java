@@ -12,6 +12,7 @@ import th.co.grouplease.simple.pm.product.command.ChangeProductTimelineCommand;
 import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @Service
 @Validated
@@ -19,7 +20,7 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
-    public Product createProduct(CreateProductCommand createProductCommand){
+    public Product createProduct(@Valid CreateProductCommand createProductCommand){
         return productRepository.save(
                 Product.create(createProductCommand.getName(),
                         createProductCommand.getProductStartDate())
@@ -27,7 +28,7 @@ public class ProductService {
         );
     }
 
-    public void deleteProduct(Long productId) {
+    public void deleteProduct(@NotNull(message = "productId cannot be null") Long productId) {
         if(!productRepository.existsById(productId)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
@@ -36,7 +37,7 @@ public class ProductService {
         }
     }
 
-    public Product changeProductName(Long productId, @Valid ChangeProductNameCommand command) {
+    public Product changeProductName(@NotNull(message = "productId cannot be null") Long productId, @Valid ChangeProductNameCommand command) {
         var productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -45,7 +46,7 @@ public class ProductService {
         return productRepository.save(productEntity);
     }
 
-    public Product changeProductTimeline(Long productId, @Valid ChangeProductTimelineCommand command) {
+    public Product changeProductTimeline(@NotNull(message = "productId cannot be null") Long productId, @Valid ChangeProductTimelineCommand command) {
         var productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
