@@ -7,15 +7,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import th.co.grouplease.simple.pm.product.command.ChangeProductNameCommand;
+import th.co.grouplease.simple.pm.product.command.ChangeProductTimelineCommand;
+import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
+import th.co.grouplease.simple.pm.product.command.DeleteProductCommand;
+import th.co.grouplease.simple.pm.product.service.ProductService;
 import th.co.grouplease.simple.pm.project.Project;
 import th.co.grouplease.simple.pm.project.ProjectRepository;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 @RestController
 @Validated
 @RequestMapping(path = "/products")
 public class ProductController {
+    @Autowired
+    private ProductService productService;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -73,5 +81,25 @@ public class ProductController {
                         .findById(productId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
         );
+    }
+
+    @PostMapping
+    public Product createProduct(@RequestBody @Valid CreateProductCommand command){
+        return productService.createProduct(command);
+    }
+
+    @PutMapping(path = "/{productId}/")
+    public Product changeProductName(@PathVariable Long productId, @RequestBody @Valid ChangeProductNameCommand command){
+        return productService.changeProductName(productId, command);
+    }
+
+    @PutMapping(path = "/{productId}/")
+    public Product changeProductTimeline(@PathVariable Long productId, @RequestBody @Valid ChangeProductTimelineCommand command){
+        return productService.changeProductTimeline(productId, command);
+    }
+
+    @DeleteMapping(path = "/{productId}")
+    public void deleteProduct(@PathVariable Long productId){
+        productService.deleteProduct(new DeleteProductCommand(productId));
     }
 }

@@ -1,46 +1,25 @@
-package th.co.grouplease.simple.pm.product;
+package th.co.grouplease.simple.pm.product.command;
 
-import th.co.grouplease.simple.pm.AuditableEntity;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
-public class Product extends AuditableEntity {
-
-    @Id
-    @GeneratedValue
-    private Long id;
-
+public class CreateProductCommand {
     @NotNull(message = "Name cannot be null")
     private String name;
-
     @NotNull(message = "Product start date cannot be null")
     private LocalDate productStartDate;
-
     private LocalDate productEndDate;
 
-    public static Product create(String name, LocalDate productStartDate){
-        var product = new Product();
-        product.setName(name);
-        product.setProductStartDate(productStartDate);
-        return product;
+    public static CreateProductCommand create(String name, LocalDate productStartDate, LocalDate productEndDate){
+        var result = new CreateProductCommand();
+        result.setName(name);
+        result.setProductStartDate(productStartDate);
+        return result;
     }
 
-    public Product withEndDate(LocalDate productEndDate){
+    public CreateProductCommand withEndDate(LocalDate productEndDate){
         this.setProductEndDate(productEndDate);
         return this;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getName() {
