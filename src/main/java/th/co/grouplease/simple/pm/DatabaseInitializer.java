@@ -83,6 +83,10 @@ public class DatabaseInitializer implements CommandLineRunner {
                 LocalDate.of(2019, 1, 1))
                 .withProject(revampCollectionProject));
 
+        workingEntryRepository.save(WorkingEntry.create(suchawadee, TypeOfWork.PROJECT,
+                LocalDate.of(2019, 1, 1))
+                .withProject(revampCollectionProject));
+
         workingEntryRepository.save(WorkingEntry.create(endoo, TypeOfWork.PROJECT,
                 LocalDate.of(2019, 1, 1))
                 .withProject(pdpaProject));

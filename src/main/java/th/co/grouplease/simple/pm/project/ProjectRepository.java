@@ -5,10 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import th.co.grouplease.simple.pm.product.Product;
 
-import java.util.List;
-
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     Page<Project> findAllByProduct(Product product, Pageable pageable);
-    <T> List<T> findAllProjectedBy(Class<T> type);
+    <T> Page<T> findAllProjectedBy(Class<T> type, Pageable pageable);
     Long countAllByProduct(Product product);
 }
