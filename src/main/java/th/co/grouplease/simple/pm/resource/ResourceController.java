@@ -36,8 +36,16 @@ public class ResourceController {
     public Page<WorkingEntry> getAllWorkingEntriesByResource(@PathVariable Long resourceId,
                                                              @RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
                                                              @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
-        return workingEntryRepository.findAllByResource(resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
+        return workingEntryRepository.findAllByResource(
+                resourceRepository.findById(resourceId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
+                WorkingEntry.class,
                 PageRequest.of(page, pageSize));
+    }
+
+    @GetMapping("/{resourceId}/working-entries/count")
+    public Long getWorkingEntryCountByResource(@PathVariable Long resourceId){
+        return workingEntryRepository.countAllByResource(resourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 }

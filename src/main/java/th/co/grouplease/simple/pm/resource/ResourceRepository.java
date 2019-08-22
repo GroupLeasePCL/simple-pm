@@ -1,9 +1,10 @@
 package th.co.grouplease.simple.pm.resource;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface ResourceRepository extends JpaRepository<Resource, Long> {
-    List<Resource> findAllByResourceTeam(ResourceTeam resourceTeam);
+    Page<Resource> findAllByResourceTeam(ResourceTeam resourceTeam, Pageable pageable);
+    Long countAllByResourceTeam(ResourceTeam resourceTeam);
 }

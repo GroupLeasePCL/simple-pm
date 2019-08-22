@@ -11,6 +11,7 @@ import java.util.List;
 public interface WorkingEntryRepository extends JpaRepository<WorkingEntry, Long> {
     <T> Page<T> findAllByProject(Project project, Class<T> type, Pageable pageable);
     Long countAllByProject(Project project);
-    Page<WorkingEntry> findAllByResource(Resource resource, Pageable pageable);
+    <T> Page<T> findAllByResource(Resource resource, Class<T> type, Pageable pageable);
+    Long countAllByResource(Resource resource);
     <T> List<T> findAllProjectedBy(Class<T> type);
 }
