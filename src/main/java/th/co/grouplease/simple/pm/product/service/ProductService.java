@@ -37,7 +37,7 @@ public class ProductService {
         }
     }
 
-    public Product changeProductName(Long productId, ChangeProductNameCommand command) {
+    public Product changeProductName(Long productId, @Valid ChangeProductNameCommand command) {
         var productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
@@ -46,7 +46,7 @@ public class ProductService {
         return productRepository.save(productEntity);
     }
 
-    public Product changeProductTimeline(Long productId, ChangeProductTimelineCommand command) {
+    public Product changeProductTimeline(Long productId, @Valid ChangeProductTimelineCommand command) {
         var productEntity = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
