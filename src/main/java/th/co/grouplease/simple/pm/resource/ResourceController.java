@@ -1,18 +1,19 @@
 package th.co.grouplease.simple.pm.resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import th.co.grouplease.simple.pm.workinglog.WorkingEntry;
 import th.co.grouplease.simple.pm.workinglog.WorkingEntryRepository;
 
-import java.util.List;
+import javax.validation.constraints.Min;
 
 @RestController
+@Validated
 @RequestMapping(path = "/resources")
 public class ResourceController {
     @Autowired
@@ -21,15 +22,22 @@ public class ResourceController {
     private WorkingEntryRepository workingEntryRepository;
 
     @GetMapping
-    public List<Resource> getAllResources(){
-        return resourceRepository.findAll();
+    public Page<Resource> getAllResources(@RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
+                                          @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
+        return resourceRepository.findAll(PageRequest.of(page, pageSize));
+    }
+
+    @GetMapping(path = "/count")
+    public Long getCount(){
+        return resourceRepository.count();
     }
 
     @GetMapping("/{resourceId}/working-entries")
-    public List<WorkingEntry> getAllWorkingEntriesByResource(@PathVariable Long resourceId){
-        var resource = resourceRepository.findById(resourceId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        return workingEntryRepository.findAllByResource(resource);
+    public Page<WorkingEntry> getAllWorkingEntriesByResource(@PathVariable Long resourceId,
+                                                             @RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
+                                                             @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
+        return workingEntryRepository.findAllByResource(resourceRepository.findById(resourceId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
+                PageRequest.of(page, pageSize));
     }
 }
