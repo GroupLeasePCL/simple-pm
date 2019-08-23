@@ -1,6 +1,8 @@
 package th.co.grouplease.simple.pm.project;
 
+import lombok.Data;
 
+@Data
 public class ProjectNameDto {
 
     private Long id;
@@ -8,22 +10,6 @@ public class ProjectNameDto {
 
     public ProjectNameDto(Long id, String name) {
         this.id = id;
-        this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
         this.name = name;
     }
 }

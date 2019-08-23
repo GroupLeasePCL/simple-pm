@@ -1,20 +1,35 @@
 package th.co.grouplease.simple.pm.product;
 
+import org.hibernate.annotations.Loader;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import th.co.grouplease.simple.pm.AuditableEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
+@Entity(name = "Product")
+@Table(name = "product")
+@SQLDelete(sql =
+        "UPDATE product " +
+                "SET deleted = true " +
+                "WHERE id = ?")
+@Loader(namedQuery = "findProductById")
+@NamedQuery(name = "findProductById", query =
+        "SELECT p " +
+                "FROM Product p " +
+                "WHERE " +
+                "    p.id = ?1 AND " +
+                "    p.deleted = false")
+@Where(clause = "deleted = false")
 public class Product extends AuditableEntity {
 
     @Id
     @GeneratedValue
     private Long id;
 
+    @Column(unique = true)
     @NotNull(message = "Name cannot be null")
     private String name;
 

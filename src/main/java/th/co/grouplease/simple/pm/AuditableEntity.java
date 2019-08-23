@@ -1,5 +1,6 @@
 package th.co.grouplease.simple.pm;
 
+import lombok.Data;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,6 +12,7 @@ import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
 
+@Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public class AuditableEntity {
@@ -18,6 +20,7 @@ public class AuditableEntity {
     private Date createdDate;
     @LastModifiedDate
     private Date lastModifiedDate;
+    private boolean deleted;
 
     public Optional<LocalDateTime> getCreatedDate() {
         return null == this.createdDate ? Optional.empty() : Optional.of(LocalDateTime.ofInstant(this.createdDate.toInstant(), ZoneId.systemDefault()));

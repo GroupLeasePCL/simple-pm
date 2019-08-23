@@ -32,7 +32,6 @@ public class ProductService {
         if(!productRepository.existsById(productId)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         } else {
-            // Change to soft deleting
             productRepository.deleteById(productId);
         }
     }

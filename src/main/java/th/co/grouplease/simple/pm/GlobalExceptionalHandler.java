@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 @Component
 public class GlobalExceptionalHandler {
+
     @ExceptionHandler
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)

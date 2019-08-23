@@ -1,6 +1,7 @@
 package th.co.grouplease.simple.pm.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import th.co.grouplease.simple.pm.AuditableEntity;
 import th.co.grouplease.simple.pm.product.Product;
 
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
+@Data
 public class Project extends AuditableEntity {
     @Id
     @GeneratedValue
@@ -46,69 +48,5 @@ public class Project extends AuditableEntity {
     public Project withStatus(ProjectStatus status){
         this.setStatus(status);
         return this;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getExpectedStartDate() {
-        return expectedStartDate;
-    }
-
-    public void setExpectedStartDate(LocalDate expectedStartDate) {
-        this.expectedStartDate = expectedStartDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public LocalDate getExpectedEndDate() {
-        return expectedEndDate;
-    }
-
-    public void setExpectedEndDate(LocalDate expectedEndDate) {
-        this.expectedEndDate = expectedEndDate;
-    }
-
-    public ProjectStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(ProjectStatus status) {
-        this.status = status;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
     }
 }
