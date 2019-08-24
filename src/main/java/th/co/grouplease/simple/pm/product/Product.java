@@ -1,14 +1,18 @@
 package th.co.grouplease.simple.pm.product;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import th.co.grouplease.simple.pm.AuditableEntity;
+import th.co.grouplease.simple.pm.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
+@Getter
+@Setter
 @Entity(name = "Product")
 @Table(name = "product")
 @SQLDelete(sql =
@@ -23,11 +27,7 @@ import java.time.LocalDate;
                 "    p.id = ?1 AND " +
                 "    p.deleted = false")
 @Where(clause = "deleted = false")
-public class Product extends AuditableEntity {
-
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Product extends BaseEntity {
 
     @Column(unique = true)
     @NotNull(message = "Name cannot be null")
@@ -48,37 +48,5 @@ public class Product extends AuditableEntity {
     public Product withEndDate(LocalDate productEndDate){
         this.setProductEndDate(productEndDate);
         return this;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getProductStartDate() {
-        return productStartDate;
-    }
-
-    public void setProductStartDate(LocalDate productStartDate) {
-        this.productStartDate = productStartDate;
-    }
-
-    public LocalDate getProductEndDate() {
-        return productEndDate;
-    }
-
-    public void setProductEndDate(LocalDate productEndDate) {
-        this.productEndDate = productEndDate;
     }
 }

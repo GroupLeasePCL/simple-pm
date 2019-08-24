@@ -1,18 +1,34 @@
 package th.co.grouplease.simple.pm.resource;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import th.co.grouplease.simple.pm.AuditableEntity;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Loader;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import th.co.grouplease.simple.pm.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
-public class Resource extends AuditableEntity {
-    @Id
-    @GeneratedValue
-    private Long id;
-
+@Getter
+@Setter
+@Entity(name = "Resource")
+@Table(name = "resource")
+@SQLDelete(sql =
+        "UPDATE resource " +
+                "SET deleted = true " +
+                "WHERE id = ?")
+@Loader(namedQuery = "findResourceById")
+@NamedQuery(name = "findResourceById", query =
+        "SELECT r " +
+                "FROM Resource r " +
+                "WHERE " +
+                "    r.id = ?1 AND " +
+                "    r.deleted = false")
+@Where(clause = "deleted = false")
+public class Resource extends BaseEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resource_team_id")
@@ -49,69 +65,5 @@ public class Resource extends AuditableEntity {
     public Resource withTeam(ResourceTeam team){
         this.setResourceTeam(team);
         return this;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public ResourceTeam getResourceTeam() {
-        return resourceTeam;
-    }
-
-    public void setResourceTeam(ResourceTeam resourceTeam) {
-        this.resourceTeam = resourceTeam;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(String employeeId) {
-        this.employeeId = employeeId;
-    }
-
-    public LocalDate getEmployeeStartDate() {
-        return employeeStartDate;
-    }
-
-    public void setEmployeeStartDate(LocalDate employeeStartDate) {
-        this.employeeStartDate = employeeStartDate;
-    }
-
-    public LocalDate getEmployeeEndDate() {
-        return employeeEndDate;
-    }
-
-    public void setEmployeeEndDate(LocalDate employeeEndDate) {
-        this.employeeEndDate = employeeEndDate;
     }
 }

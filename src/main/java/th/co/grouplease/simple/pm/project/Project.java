@@ -1,20 +1,35 @@
 package th.co.grouplease.simple.pm.project;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
-import th.co.grouplease.simple.pm.AuditableEntity;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Loader;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import th.co.grouplease.simple.pm.BaseEntity;
 import th.co.grouplease.simple.pm.product.Product;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
-@Data
-public class Project extends AuditableEntity {
-    @Id
-    @GeneratedValue
-    private Long id;
+@Getter
+@Setter
+@Entity(name = "Project")
+@Table(name = "project")
+@SQLDelete(sql =
+        "UPDATE project " +
+                "SET deleted = true " +
+                "WHERE id = ?")
+@Loader(namedQuery = "findProjectById")
+@NamedQuery(name = "findProjectById", query =
+        "SELECT p " +
+                "FROM Project p " +
+                "WHERE " +
+                "    p.id = ?1 AND " +
+                "    p.deleted = false")
+@Where(clause = "deleted = false")
+public class Project extends BaseEntity {
 
     @NotNull(message = "Project name cannot be null")
     private String name;

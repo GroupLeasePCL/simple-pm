@@ -1,7 +1,12 @@
 package th.co.grouplease.simple.pm.workinglog;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import th.co.grouplease.simple.pm.AuditableEntity;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Loader;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import th.co.grouplease.simple.pm.BaseEntity;
 import th.co.grouplease.simple.pm.product.ProductRelease;
 import th.co.grouplease.simple.pm.project.Project;
 import th.co.grouplease.simple.pm.resource.Resource;
@@ -10,12 +15,23 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
-@Entity
-public class WorkingEntry extends AuditableEntity {
-    @Id
-    @GeneratedValue
-    private Long id;
-
+@Getter
+@Setter
+@Entity(name = "WorkingEntry")
+@Table(name = "working_entry")
+@SQLDelete(sql =
+        "UPDATE working_entry " +
+                "SET deleted = true " +
+                "WHERE id = ?")
+@Loader(namedQuery = "findWorkingEntryById")
+@NamedQuery(name = "findWorkingEntryById", query =
+        "SELECT w " +
+                "FROM WorkingEntry w " +
+                "WHERE " +
+                "    w.id = ?1 AND " +
+                "    w.deleted = false")
+@Where(clause = "deleted = false")
+public class WorkingEntry extends BaseEntity {
     @JsonIgnore
     @NotNull(message = "Resource cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -58,53 +74,5 @@ public class WorkingEntry extends AuditableEntity {
     public WorkingEntry withRelease(ProductRelease productRelease){
         this.setRelease(productRelease);
         return this;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Resource getResource() {
-        return resource;
-    }
-
-    public void setResource(Resource resource) {
-        this.resource = resource;
-    }
-
-    public TypeOfWork getTypeOfWork() {
-        return typeOfWork;
-    }
-
-    public void setTypeOfWork(TypeOfWork typeOfWork) {
-        this.typeOfWork = typeOfWork;
-    }
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
-    public ProductRelease getRelease() {
-        return release;
-    }
-
-    public void setRelease(ProductRelease release) {
-        this.release = release;
-    }
-
-    public LocalDate getWorkingDate() {
-        return workingDate;
-    }
-
-    public void setWorkingDate(LocalDate workingDate) {
-        this.workingDate = workingDate;
     }
 }

@@ -1,38 +1,39 @@
 package th.co.grouplease.simple.pm.resource;
 
-import th.co.grouplease.simple.pm.AuditableEntity;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.Loader;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import th.co.grouplease.simple.pm.BaseEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
-@Entity
-public class ResourceTeam extends AuditableEntity {
-    @Id
-    @GeneratedValue
-    private Long id;
+@Getter
+@Setter
+@Entity(name = "ResourceTeam")
+@Table(name = "resource_team")
+@SQLDelete(sql =
+        "UPDATE resource_team " +
+                "SET deleted = true " +
+                "WHERE id = ?")
+@Loader(namedQuery = "findResourceTeamById")
+@NamedQuery(name = "findResourceTeamById", query =
+        "SELECT r " +
+                "FROM ResourceTeam r " +
+                "WHERE " +
+                "    r.id = ?1 AND " +
+                "    r.deleted = false")
+@Where(clause = "deleted = false")
+public class ResourceTeam extends BaseEntity {
 
+    @NotNull(message = "Name cannot be null")
     private String name;
 
     public static ResourceTeam create(String name){
         var resourceTeam = new ResourceTeam();
         resourceTeam.setName(name);
         return resourceTeam;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }
