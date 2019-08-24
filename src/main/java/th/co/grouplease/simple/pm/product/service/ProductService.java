@@ -5,12 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.server.ResponseStatusException;
-import th.co.grouplease.simple.pm.product.Product;
-import th.co.grouplease.simple.pm.product.ProductRepository;
-import th.co.grouplease.simple.pm.product.command.ChangeProductNameCommand;
-import th.co.grouplease.simple.pm.product.command.ChangeProductTimelineCommand;
-import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
+import th.co.grouplease.simple.pm.product.command.*;
+import th.co.grouplease.simple.pm.product.domain.model.Product;
+import th.co.grouplease.simple.pm.product.domain.model.ProductRelease;
+import th.co.grouplease.simple.pm.product.repository.ProductReleaseRepository;
+import th.co.grouplease.simple.pm.product.repository.ProductRepository;
 
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -19,39 +20,50 @@ import javax.validation.constraints.NotNull;
 public class ProductService {
     @Autowired
     private ProductRepository productRepository;
+    @Autowired
+    private ProductReleaseRepository productReleaseRepository;
 
-    public Product createProduct(@Valid CreateProductCommand createProductCommand){
-        return productRepository.save(
-                Product.create(createProductCommand.getName(),
-                        createProductCommand.getProductStartDate())
-                        .withEndDate(createProductCommand.getProductEndDate())
-        );
+    @Transactional
+    public Product createProduct(@Valid CreateProductCommand command){
+        return productRepository.save(new Product(command));
     }
 
-    public void deleteProduct(@NotNull(message = "productId cannot be null") Long productId) {
-        if(!productRepository.existsById(productId)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        } else {
-            productRepository.deleteById(productId);
-        }
-    }
-
-    public Product changeProductName(@NotNull(message = "productId cannot be null") Long productId, @Valid ChangeProductNameCommand command) {
-        var productEntity = productRepository.findById(productId)
+    @Transactional
+    public void deleteProduct(@NotNull(message = "productId cannot be null") String productId) {
+        var product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        productEntity.setName(command.getName());
-
-        return productRepository.save(productEntity);
+        product.delete(new DeleteProductCommand(productId));
+        productRepository.save(product);
     }
 
-    public Product changeProductTimeline(@NotNull(message = "productId cannot be null") Long productId, @Valid ChangeProductTimelineCommand command) {
-        var productEntity = productRepository.findById(productId)
+    @Transactional
+    public void changeProductName(@Valid ChangeProductNameCommand command) {
+        var product = productRepository.findById(command.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        product.changeName(command);
+        productRepository.save(product);
+    }
 
-        productEntity.setProductStartDate(command.getProductStartDate());
-        productEntity.setProductEndDate(command.getProductEndDate());
+    @Transactional
+    public void changeProductTimeline(@Valid ChangeProductTimelineCommand command) {
+        var product = productRepository.findById(command.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        product.changeTimeline(command);
+        productRepository.save(product);
+    }
 
-        return productRepository.save(productEntity);
+    @Transactional
+    public void createProductRelease(@Valid CreateProductReleaseCommand command){
+        var product = productRepository.findById(command.getProductId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find productId: " + command.getProductId()));
+        productReleaseRepository.save(new ProductRelease(command, product));
+    }
+
+    @Transactional
+    public void deleteProductRelease(@NotNull(message = "productReleaseId cannot be null") String productReleaseId){
+        var productRelease = productReleaseRepository.findById(productReleaseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        productRelease.delete(new DeleteProductReleaseCommand(productReleaseId));
+        productReleaseRepository.save(productRelease);
     }
 }

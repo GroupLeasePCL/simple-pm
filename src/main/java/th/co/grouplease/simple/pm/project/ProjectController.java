@@ -39,7 +39,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/working-entries")
-    public Page<ProjectWorkingEntryDto> getWorkingEntriesByProject(@PathVariable Long projectId,
+    public Page<ProjectWorkingEntryDto> getWorkingEntriesByProject(@PathVariable String projectId,
                                                                    @RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
                                                                    @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
         return workingEntryRepository.findAllByProject(
@@ -51,7 +51,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{projectId}/working-entries/count")
-    public Long getWorkingEntryCountForProject(@PathVariable Long projectId){
+    public Long getWorkingEntryCountForProject(@PathVariable String projectId){
         return workingEntryRepository.countAllByProject(
                 projectRepository.findById(projectId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))

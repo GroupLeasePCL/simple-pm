@@ -6,8 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import th.co.grouplease.simple.pm.BaseEntity;
-import th.co.grouplease.simple.pm.product.Product;
+import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
+import th.co.grouplease.simple.pm.product.domain.model.Product;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -29,7 +29,7 @@ import java.time.LocalDate;
                 "    p.id = ?1 AND " +
                 "    p.deleted = false")
 @Where(clause = "deleted = false")
-public class Project extends BaseEntity {
+public class Project extends BaseAggregateRootEntity<Project> {
 
     @NotNull(message = "Project name cannot be null")
     private String name;
@@ -48,8 +48,9 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public static Project create(String name){
+    public static Project create(String id, String name){
         var project = new Project();
+        project.setId(id);
         project.setName(name);
         project.setStatus(ProjectStatus.TODO);
         return project;
@@ -57,11 +58,6 @@ public class Project extends BaseEntity {
 
     public Project withProduct(Product product){
         this.setProduct(product);
-        return this;
-    }
-
-    public Project withStatus(ProjectStatus status){
-        this.setStatus(status);
         return this;
     }
 }

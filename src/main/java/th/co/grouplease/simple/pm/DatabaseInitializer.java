@@ -1,12 +1,14 @@
 package th.co.grouplease.simple.pm;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import th.co.grouplease.simple.pm.product.Product;
-import th.co.grouplease.simple.pm.product.ProductRelease;
-import th.co.grouplease.simple.pm.product.ProductReleaseRepository;
-import th.co.grouplease.simple.pm.product.ProductRepository;
+import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
+import th.co.grouplease.simple.pm.product.command.CreateProductReleaseCommand;
+import th.co.grouplease.simple.pm.product.repository.ProductRepository;
+import th.co.grouplease.simple.pm.product.service.ProductService;
 import th.co.grouplease.simple.pm.project.Project;
 import th.co.grouplease.simple.pm.project.ProjectRepository;
 import th.co.grouplease.simple.pm.resource.Resource;
@@ -18,14 +20,12 @@ import th.co.grouplease.simple.pm.workinglog.WorkingEntry;
 import th.co.grouplease.simple.pm.workinglog.WorkingEntryRepository;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
-
     @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private ProductReleaseRepository productReleaseRepository;
+    private ProductService productService;
     @Autowired
     private ProjectRepository projectRepository;
     @Autowired
@@ -38,64 +38,73 @@ public class DatabaseInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Initialize products and releases
-        var productGL = productRepository.save(Product.create("GL", LocalDate.of(2000, 1, 1)));
-        var productTels = productRepository.save(Product.create("Tels", LocalDate.of(2005, 1, 1)));
-        var productFinWiz = productRepository.save(Product.create("FinWiz", LocalDate.of(2018, 9, 1)));
+        var productGL = productService.createProduct(
+                new CreateProductCommand(UUID.randomUUID().toString(), "GL", LocalDate.of(2000, 1, 1), null));
+        var productTels = productService.createProduct(
+                new CreateProductCommand(UUID.randomUUID().toString(), "Tels", LocalDate.of(2005, 1, 1), null));
+        var productFinWiz = productService.createProduct(
+                new CreateProductCommand(UUID.randomUUID().toString(), "FinWiz", LocalDate.of(2018, 9, 1), null));
 
-        productReleaseRepository.save(ProductRelease.create(productGL, "2.5.0", LocalDate.of(2019, 1, 1)));
-        productReleaseRepository.save(ProductRelease.create(productGL, "2.5.1", LocalDate.of(2019, 2, 1)));
+        productService.createProductRelease(
+                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productGL.getId(), "2.5.0", LocalDate.of(2019, 1, 1)));
+        productService.createProductRelease(
+                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productGL.getId(), "2.5.1", LocalDate.of(2019, 2, 1)));
 
-        productReleaseRepository.save(ProductRelease.create(productTels, "2.0.0", LocalDate.of(2019, 1, 1)));
-        productReleaseRepository.save(ProductRelease.create(productTels, "2.0.1", LocalDate.of(2019, 2, 1)));
+        productService.createProductRelease(
+                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productTels.getId(), "2.0.0", LocalDate.of(2019, 1, 1)));
+        productService.createProductRelease(
+                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productTels.getId(), "2.0.1", LocalDate.of(2019, 2, 1)));
 
-        productReleaseRepository.save(ProductRelease.create(productFinWiz, "1.0.0", LocalDate.of(2019, 1, 1)));
-        productReleaseRepository.save(ProductRelease.create(productFinWiz, "1.1.0", LocalDate.of(2019, 2, 1)));
+        productService.createProductRelease(
+                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productFinWiz.getId(), "1.0.0", LocalDate.of(2019, 1, 1)));
+        productService.createProductRelease(
+                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productFinWiz.getId(), "1.1.0", LocalDate.of(2019, 2, 1)));
 
         // Initialize projects
-        var revampCollectionProject = Project.create("Revamp collection")
+        var revampCollectionProject = Project.create(UUID.randomUUID().toString(), "Revamp collection")
                 .withProduct(productFinWiz);
-        var revampCustodianProject = Project.create("Revamp custodian")
+        var revampCustodianProject = Project.create(UUID.randomUUID().toString(), "Revamp custodian")
                 .withProduct(productFinWiz);
         projectRepository.save(revampCollectionProject);
         projectRepository.save(revampCustodianProject);
 
-        var pdpaProject = Project.create("Privacy data protection act");
+        var pdpaProject = Project.create(UUID.randomUUID().toString(), "Privacy data protection act");
         projectRepository.save(pdpaProject);
 
         // Initialize resources and teams
-        var softwareDevelopmentTeam = ResourceTeam.create("Software development");
+        var softwareDevelopmentTeam = ResourceTeam.create(UUID.randomUUID().toString(), "Software development");
         resourceTeamRepository.save(softwareDevelopmentTeam);
-        var atip = Resource.create("atip", "Atip", "Choowisetwanitch", "44428", LocalDate.of(2018, 1, 1))
+        var atip = Resource.create(UUID.randomUUID().toString(), "atip", "Atip", "Choowisetwanitch", "44428", LocalDate.of(2018, 1, 1))
                 .withTeam(softwareDevelopmentTeam);
-        var suchawadee = Resource.create("suchawadee", "Suchawadee", "Sinma", "53773", LocalDate.of(2017, 1, 1))
+        var suchawadee = Resource.create(UUID.randomUUID().toString(), "suchawadee", "Suchawadee", "Sinma", "53773", LocalDate.of(2017, 1, 1))
                 .withTeam(softwareDevelopmentTeam);
         resourceRepository.save(atip);
         resourceRepository.save(suchawadee);
 
-        var govTeam = ResourceTeam.create("Governance");
+        var govTeam = ResourceTeam.create(UUID.randomUUID().toString(), "Governance");
         resourceTeamRepository.save(govTeam);
-        var endoo = Resource.create("endoo", "Endoo", "Akarum", "64345", LocalDate.of(2018, 1, 1))
+        var endoo = Resource.create(UUID.randomUUID().toString(), "endoo", "Endoo", "Akarum", "64345", LocalDate.of(2018, 1, 1))
                 .withTeam(govTeam);
         resourceRepository.save(endoo);
 
         // Initialize working entries
-        workingEntryRepository.save(WorkingEntry.create(atip, TypeOfWork.PROJECT,
+        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), atip, TypeOfWork.PROJECT,
                 LocalDate.of(2019, 1, 1))
                 .withProject(revampCollectionProject));
 
-        workingEntryRepository.save(WorkingEntry.create(suchawadee, TypeOfWork.PROJECT,
+        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), suchawadee, TypeOfWork.PROJECT,
                 LocalDate.of(2019, 1, 1))
                 .withProject(revampCollectionProject));
 
-        workingEntryRepository.save(WorkingEntry.create(endoo, TypeOfWork.PROJECT,
+        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), endoo, TypeOfWork.PROJECT,
                 LocalDate.of(2019, 1, 1))
                 .withProject(pdpaProject));
 
-        workingEntryRepository.save(WorkingEntry.create(atip, TypeOfWork.PROJECT,
+        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), atip, TypeOfWork.PROJECT,
                 LocalDate.of(2019, 1, 2))
                 .withProject(revampCustodianProject));
 
-        workingEntryRepository.save(WorkingEntry.create(suchawadee, TypeOfWork.SUPPORT,
+        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), suchawadee, TypeOfWork.SUPPORT,
                 LocalDate.of(2019, 1, 2)));
     }
 }

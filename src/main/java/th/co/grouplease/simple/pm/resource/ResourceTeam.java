@@ -5,7 +5,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import th.co.grouplease.simple.pm.BaseEntity;
+import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,13 +26,14 @@ import javax.validation.constraints.NotNull;
                 "    r.id = ?1 AND " +
                 "    r.deleted = false")
 @Where(clause = "deleted = false")
-public class ResourceTeam extends BaseEntity {
+public class ResourceTeam extends BaseAggregateRootEntity<ResourceTeam> {
 
     @NotNull(message = "Name cannot be null")
     private String name;
 
-    public static ResourceTeam create(String name){
+    public static ResourceTeam create(String id, String name){
         var resourceTeam = new ResourceTeam();
+        resourceTeam.setId(id);
         resourceTeam.setName(name);
         return resourceTeam;
     }

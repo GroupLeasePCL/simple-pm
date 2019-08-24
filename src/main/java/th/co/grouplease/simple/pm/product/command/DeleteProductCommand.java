@@ -5,9 +5,7 @@ import lombok.Value;
 import javax.validation.constraints.NotNull;
 
 @Value
-public class ChangeProductNameCommand {
+public class DeleteProductCommand {
     @NotNull(message = "id cannot be null")
     private String id;
-    @NotNull(message = "name cannot be null")
-    private String name;
 }

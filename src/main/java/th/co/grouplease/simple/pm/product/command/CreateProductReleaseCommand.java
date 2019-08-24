@@ -6,10 +6,13 @@ import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Value
-public class ChangeProductTimelineCommand {
+public class CreateProductReleaseCommand {
     @NotNull(message = "id cannot be null")
     private String id;
-    @NotNull(message = "Product start date cannot be null")
-    private LocalDate productStartDate;
-    private LocalDate productEndDate;
+    @NotNull(message = "productId cannot be null")
+    private String productId;
+    @NotNull
+    private String version;
+    @NotNull
+    private LocalDate releaseDate;
 }

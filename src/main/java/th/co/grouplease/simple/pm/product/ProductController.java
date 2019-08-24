@@ -3,7 +3,6 @@ package th.co.grouplease.simple.pm.product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +10,10 @@ import org.springframework.web.server.ResponseStatusException;
 import th.co.grouplease.simple.pm.product.command.ChangeProductNameCommand;
 import th.co.grouplease.simple.pm.product.command.ChangeProductTimelineCommand;
 import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
+import th.co.grouplease.simple.pm.product.domain.model.Product;
+import th.co.grouplease.simple.pm.product.domain.model.ProductRelease;
+import th.co.grouplease.simple.pm.product.repository.ProductReleaseRepository;
+import th.co.grouplease.simple.pm.product.repository.ProductRepository;
 import th.co.grouplease.simple.pm.product.service.ProductService;
 import th.co.grouplease.simple.pm.project.Project;
 import th.co.grouplease.simple.pm.project.ProjectRepository;
@@ -43,7 +46,7 @@ public class ProductController {
     }
 
     @GetMapping(path = "/{productId}/releases")
-    public Page<ProductRelease> getAllReleasesForProduct(@PathVariable Long productId,
+    public Page<ProductRelease> getAllReleasesForProduct(@PathVariable String productId,
                                                          @RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
                                                          @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
         return productReleaseRepository.findAllByProduct(
@@ -55,7 +58,7 @@ public class ProductController {
     }
 
     @GetMapping(path = "/{productId}/releases/count")
-    public Long getReleaseCountForProduct(@PathVariable Long productId){
+    public Long getReleaseCountForProduct(@PathVariable String productId){
         return productReleaseRepository.countAllByProduct(
                 productRepository
                         .findById(productId)
@@ -64,7 +67,7 @@ public class ProductController {
     }
 
     @GetMapping(path = "/{productId}/projects")
-    public Page<Project> getAllProjectsForProduct(@PathVariable Long productId,
+    public Page<Project> getAllProjectsForProduct(@PathVariable String productId,
                                                   @RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
                                                   @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
         return projectRepository.findAllByProduct(
@@ -75,7 +78,7 @@ public class ProductController {
     }
 
     @GetMapping(path = "/{productId}/projects/count")
-    public Long getProjectCountForProduct(@PathVariable Long productId){
+    public Long getProjectCountForProduct(@PathVariable String productId){
         return projectRepository.countAllByProduct(
                 productRepository
                         .findById(productId)
@@ -84,7 +87,7 @@ public class ProductController {
     }
 
     @GetMapping(path = "/{productId}")
-    public Product getProductById(@PathVariable Long productId){
+    public Product getProductById(@PathVariable String productId){
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
@@ -95,17 +98,17 @@ public class ProductController {
     }
 
     @PutMapping(path = "/{productId}/", produces = "application/change-product-name+command")
-    public Product changeProductName(@PathVariable Long productId, @RequestBody @Valid ChangeProductNameCommand command){
-        return productService.changeProductName(productId, command);
+    public void changeProductName(@PathVariable String productId, @RequestBody @Valid ChangeProductNameCommand command){
+        productService.changeProductName(command);
     }
 
     @PutMapping(path = "/{productId}/", produces = "application/change-product-timeline+command")
-    public Product changeProductTimeline(@PathVariable Long productId, @RequestBody @Valid ChangeProductTimelineCommand command){
-        return productService.changeProductTimeline(productId, command);
+    public void changeProductTimeline(@PathVariable String productId, @RequestBody @Valid ChangeProductTimelineCommand command){
+        productService.changeProductTimeline(command);
     }
 
     @DeleteMapping(path = "/{productId}")
-    public void deleteProduct(@PathVariable Long productId){
+    public void deleteProduct(@PathVariable String productId){
         productService.deleteProduct(productId);
     }
 }

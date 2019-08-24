@@ -31,7 +31,7 @@ public class ResourceTeamController {
     }
 
     @GetMapping(path = "/{teamId}/resources")
-    public Page<Resource> getAllResourcesByTeam(@PathVariable Long teamId,
+    public Page<Resource> getAllResourcesByTeam(@PathVariable String teamId,
                                                 @RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
                                                 @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
         return resourceRepository.findAllByResourceTeam(
@@ -41,7 +41,7 @@ public class ResourceTeamController {
     }
 
     @GetMapping(path = "/{teamId}/resources/count")
-    public Long getResourceCountByTeam(@PathVariable Long teamId){
+    public Long getResourceCountByTeam(@PathVariable String teamId){
         return resourceRepository.countAllByResourceTeam(
                 resourceTeamRepository.findById(teamId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));

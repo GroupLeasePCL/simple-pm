@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import th.co.grouplease.simple.pm.project.Project;
 import th.co.grouplease.simple.pm.resource.Resource;
 
-public interface WorkingEntryRepository extends JpaRepository<WorkingEntry, Long> {
+public interface WorkingEntryRepository extends JpaRepository<WorkingEntry, String> {
     <T> Page<T> findAllByProject(Project project, Class<T> type, Pageable pageable);
     Long countAllByProject(Project project);
     <T> Page<T> findAllByResource(Resource resource, Class<T> type, Pageable pageable);

@@ -1,4 +1,4 @@
-package th.co.grouplease.simple.pm;
+package th.co.grouplease.simple.pm.common;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
