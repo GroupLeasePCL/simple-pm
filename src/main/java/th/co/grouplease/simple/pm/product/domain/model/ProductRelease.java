@@ -1,17 +1,14 @@
 package th.co.grouplease.simple.pm.product.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
-import th.co.grouplease.simple.pm.product.command.CreateProductReleaseCommand;
-import th.co.grouplease.simple.pm.product.command.DeleteProductReleaseCommand;
-import th.co.grouplease.simple.pm.product.event.ProductReleaseCreatedEvent;
-import th.co.grouplease.simple.pm.product.event.ProductReleaseDeletedEvent;
+import th.co.grouplease.simple.pm.common.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,6 +17,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "ProductRelease")
 @Table(name = "product_release")
 @SQLDelete(sql =
@@ -34,7 +32,7 @@ import java.time.LocalDate;
                 "    p.id = ?1 AND " +
                 "    p.deleted = false")
 @Where(clause = "deleted = false")
-public class ProductRelease extends BaseAggregateRootEntity<ProductRelease> {
+public class ProductRelease extends BaseEntity {
     @JsonIgnore
     @NotNull(message = "product cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,17 +44,4 @@ public class ProductRelease extends BaseAggregateRootEntity<ProductRelease> {
 
     @NotNull(message = "Release date cannot be null")
     private LocalDate releaseDate;
-
-    public ProductRelease(CreateProductReleaseCommand command, Product product){
-        setId(command.getId());
-        this.product = product;
-        this.version = command.getVersion();
-        this.releaseDate = command.getReleaseDate();
-        registerEvent(new ProductReleaseCreatedEvent(command.getId(), command.getProductId(), command.getVersion(), command.getReleaseDate()));
-    }
-
-    public void delete(DeleteProductReleaseCommand command){
-        markDeleted();
-        registerEvent(new ProductReleaseDeletedEvent(command.getId()));
-    }
 }

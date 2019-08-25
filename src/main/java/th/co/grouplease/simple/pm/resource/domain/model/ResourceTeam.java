@@ -1,17 +1,22 @@
-package th.co.grouplease.simple.pm.resource;
+package th.co.grouplease.simple.pm.resource.domain.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
+import th.co.grouplease.simple.pm.common.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "ResourceTeam")
 @Table(name = "resource_team")
 @SQLDelete(sql =
@@ -26,15 +31,8 @@ import javax.validation.constraints.NotNull;
                 "    r.id = ?1 AND " +
                 "    r.deleted = false")
 @Where(clause = "deleted = false")
-public class ResourceTeam extends BaseAggregateRootEntity<ResourceTeam> {
+public class ResourceTeam extends BaseEntity {
 
     @NotNull(message = "Name cannot be null")
     private String name;
-
-    public static ResourceTeam create(String id, String name){
-        var resourceTeam = new ResourceTeam();
-        resourceTeam.setId(id);
-        resourceTeam.setName(name);
-        return resourceTeam;
-    }
 }

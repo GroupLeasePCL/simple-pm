@@ -1,13 +1,18 @@
-package th.co.grouplease.simple.pm.project;
+package th.co.grouplease.simple.pm.project.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
 import th.co.grouplease.simple.pm.product.domain.model.Product;
+import th.co.grouplease.simple.pm.project.command.CreateProjectCommand;
+import th.co.grouplease.simple.pm.project.command.DeleteProjectCommand;
+import th.co.grouplease.simple.pm.project.event.ProjectCreatedEvent;
+import th.co.grouplease.simple.pm.project.event.ProjectDeletedEvent;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -15,6 +20,7 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity(name = "Project")
 @Table(name = "project")
 @SQLDelete(sql =
@@ -48,16 +54,16 @@ public class Project extends BaseAggregateRootEntity<Project> {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    public static Project create(String id, String name){
-        var project = new Project();
-        project.setId(id);
-        project.setName(name);
-        project.setStatus(ProjectStatus.TODO);
-        return project;
+    public Project(CreateProjectCommand command, Product product){
+        setId(command.getId());
+        this.name = command.getName();
+        this.status = ProjectStatus.TODO;
+        this.product = product;
+        registerEvent(new ProjectCreatedEvent(command.getId(), command.getName(), command.getProductId(), this.status));
     }
 
-    public Project withProduct(Product product){
-        this.setProduct(product);
-        return this;
+    public void markDeleted(DeleteProjectCommand command){
+        super.markDeleted();
+        registerEvent(new ProjectDeletedEvent(command.getId()));
     }
 }

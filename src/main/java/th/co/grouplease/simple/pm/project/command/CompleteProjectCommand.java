@@ -7,6 +7,8 @@ import java.time.LocalDate;
 
 @Value
 public class CompleteProjectCommand {
+    @NotNull
+    private String id;
     @NotNull(message = "End date cannot be null")
     private LocalDate endDate;
 }

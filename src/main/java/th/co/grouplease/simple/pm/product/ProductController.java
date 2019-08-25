@@ -7,26 +7,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import th.co.grouplease.simple.pm.product.command.ChangeProductNameCommand;
-import th.co.grouplease.simple.pm.product.command.ChangeProductTimelineCommand;
-import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
 import th.co.grouplease.simple.pm.product.domain.model.Product;
 import th.co.grouplease.simple.pm.product.domain.model.ProductRelease;
 import th.co.grouplease.simple.pm.product.repository.ProductReleaseRepository;
 import th.co.grouplease.simple.pm.product.repository.ProductRepository;
-import th.co.grouplease.simple.pm.product.service.ProductService;
-import th.co.grouplease.simple.pm.project.Project;
-import th.co.grouplease.simple.pm.project.ProjectRepository;
+import th.co.grouplease.simple.pm.project.domain.model.Project;
+import th.co.grouplease.simple.pm.project.repository.ProjectRepository;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 @RestController
 @Validated
-@RequestMapping(path = "/products")
+@RequestMapping
 public class ProductController {
-    @Autowired
-    private ProductService productService;
     @Autowired
     private ProductRepository productRepository;
     @Autowired
@@ -34,19 +28,85 @@ public class ProductController {
     @Autowired
     private ProjectRepository projectRepository;
 
-    @GetMapping
+    // product endpoints
+    @GetMapping(path = "/products")
     public Page<Product> getAllProducts(@RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
                                         @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
         return productRepository.findAll(PageRequest.of(page, pageSize));
     }
 
-    @GetMapping(path = "/count")
+    @PostMapping(path = "/products")
+    public Product createProduct(@RequestBody @Valid Product product){
+        return productRepository.save(product);
+    }
+
+    @PutMapping(path = "/products/{productId}")
+    public Product updateProduct(@PathVariable Long productId, @RequestBody @Valid Product product){
+        if(!productId.equals(product.getId())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "productId is not equal to product.productId");
+        }
+
+        if(productRepository.existsById(product.getId())){
+            return productRepository.save(product);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @DeleteMapping(path = "/products/{productId}")
+    public void deleteProduct(@PathVariable Long productId){
+        if(productRepository.existsById(productId)){
+            productRepository.deleteById(productId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(path = "/products/count")
     public Long getCount(){
         return productRepository.count();
     }
 
-    @GetMapping(path = "/{productId}/releases")
-    public Page<ProductRelease> getAllReleasesForProduct(@PathVariable String productId,
+    @GetMapping(path = "/products/{productId}")
+    public Product getProductById(@PathVariable Long productId){
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    // productRelease endpoints
+    @PostMapping(path = "/products/{productId}/releases")
+    public ProductRelease createProductRelease(@PathVariable Long productId, @RequestBody @Valid ProductRelease productRelease){
+        var product = productRepository.findById(productId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find productId: " + productId));
+        productRelease.setProduct(product);
+        return productReleaseRepository.save(productRelease);
+    }
+
+    @PutMapping(path = "/products/{productId}/releases/{releaseId}")
+    public ProductRelease updateProductRelease(@PathVariable Long productId,
+                                               @PathVariable Long releaseId,
+                                               @RequestBody @Valid ProductRelease productRelease){
+        if(productReleaseRepository.existsById(releaseId)) {
+            var product = productRepository.findById(productId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find productId: " + productId));
+            productRelease.setProduct(product);
+            return productReleaseRepository.save(productRelease);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Cannot find releaseId: " + releaseId);
+        }
+    }
+
+    @DeleteMapping(path = "/releases/{releaseId}")
+    public void deleteProductRelease(@PathVariable Long releaseId){
+        if(productReleaseRepository.existsById(releaseId)){
+            productReleaseRepository.deleteById(releaseId);
+        } else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping(path = "/products/{productId}/releases")
+    public Page<ProductRelease> getAllReleasesForProduct(@PathVariable Long productId,
                                                          @RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
                                                          @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
         return productReleaseRepository.findAllByProduct(
@@ -57,8 +117,8 @@ public class ProductController {
         );
     }
 
-    @GetMapping(path = "/{productId}/releases/count")
-    public Long getReleaseCountForProduct(@PathVariable String productId){
+    @GetMapping(path = "/products/{productId}/releases/count")
+    public Long getReleaseCountForProduct(@PathVariable Long productId){
         return productReleaseRepository.countAllByProduct(
                 productRepository
                         .findById(productId)
@@ -66,8 +126,21 @@ public class ProductController {
         );
     }
 
-    @GetMapping(path = "/{productId}/projects")
-    public Page<Project> getAllProjectsForProduct(@PathVariable String productId,
+    @GetMapping(path = "/releases/{releaseId}")
+    public ProductRelease getReleaseByReleaseId(@PathVariable Long releaseId){
+        return productReleaseRepository.findById(releaseId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    }
+
+    @GetMapping(path = "/releases")
+    public Page<ProductRelease> getAllReleases(@RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
+                                               @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
+        return productReleaseRepository.findAll(PageRequest.of(page, pageSize));
+    }
+
+    // project endpoints
+    @GetMapping(path = "/products/{productId}/projects")
+    public Page<Project> getAllProjectsForProduct(@PathVariable Long productId,
                                                   @RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
                                                   @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
         return projectRepository.findAllByProduct(
@@ -77,38 +150,12 @@ public class ProductController {
         );
     }
 
-    @GetMapping(path = "/{productId}/projects/count")
-    public Long getProjectCountForProduct(@PathVariable String productId){
+    @GetMapping(path = "/products/{productId}/projects/count")
+    public Long getProjectCountForProduct(@PathVariable Long productId){
         return projectRepository.countAllByProduct(
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
         );
-    }
-
-    @GetMapping(path = "/{productId}")
-    public Product getProductById(@PathVariable String productId){
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
-
-    @PostMapping
-    public Product createProduct(@RequestBody @Valid CreateProductCommand command){
-        return productService.createProduct(command);
-    }
-
-    @PutMapping(path = "/{productId}/", produces = "application/change-product-name+command")
-    public void changeProductName(@PathVariable String productId, @RequestBody @Valid ChangeProductNameCommand command){
-        productService.changeProductName(command);
-    }
-
-    @PutMapping(path = "/{productId}/", produces = "application/change-product-timeline+command")
-    public void changeProductTimeline(@PathVariable String productId, @RequestBody @Valid ChangeProductTimelineCommand command){
-        productService.changeProductTimeline(command);
-    }
-
-    @DeleteMapping(path = "/{productId}")
-    public void deleteProduct(@PathVariable String productId){
-        productService.deleteProduct(productId);
     }
 }

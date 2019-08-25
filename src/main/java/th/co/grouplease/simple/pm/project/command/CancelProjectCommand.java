@@ -6,6 +6,8 @@ import javax.validation.constraints.NotNull;
 
 @Value
 public class CancelProjectCommand {
+    @NotNull
+    private String id;
     @NotNull(message = "Reason cannot be null")
     private String reason;
 }

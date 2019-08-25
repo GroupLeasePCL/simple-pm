@@ -7,9 +7,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import th.co.grouplease.simple.pm.project.command.CreateProjectCommand;
+import th.co.grouplease.simple.pm.project.command.DeleteProjectCommand;
+import th.co.grouplease.simple.pm.project.domain.model.Project;
+import th.co.grouplease.simple.pm.project.repository.ProjectRepository;
+import th.co.grouplease.simple.pm.project.service.ProjectService;
 import th.co.grouplease.simple.pm.workinglog.ProjectWorkingEntryDto;
-import th.co.grouplease.simple.pm.workinglog.WorkingEntryRepository;
+import th.co.grouplease.simple.pm.workinglog.repository.WorkingEntryRepository;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 @RestController
@@ -17,9 +23,21 @@ import javax.validation.constraints.Min;
 @RequestMapping(path = "/projects")
 public class ProjectController {
     @Autowired
+    private ProjectService projectService;
+    @Autowired
     private ProjectRepository projectRepository;
     @Autowired
     private WorkingEntryRepository workingEntryRepository;
+
+    @PostMapping
+    public Project create(@RequestBody @Valid CreateProjectCommand command){
+        return projectService.createProject(command);
+    }
+
+    @DeleteMapping("/{projectId}")
+    public void delete(@PathVariable String projectId){
+        projectService.deleteProject(new DeleteProjectCommand(projectId));
+    }
 
     @GetMapping(produces = "application/product+json")
     public Page<Project> getAllProjects(@RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,

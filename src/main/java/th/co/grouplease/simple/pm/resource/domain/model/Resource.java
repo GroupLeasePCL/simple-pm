@@ -1,12 +1,14 @@
-package th.co.grouplease.simple.pm.resource;
+package th.co.grouplease.simple.pm.resource.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
+import th.co.grouplease.simple.pm.common.BaseEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -14,6 +16,8 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "Resource")
 @Table(name = "resource")
 @SQLDelete(sql =
@@ -28,7 +32,7 @@ import java.time.LocalDate;
                 "    r.id = ?1 AND " +
                 "    r.deleted = false")
 @Where(clause = "deleted = false")
-public class Resource extends BaseAggregateRootEntity<Resource> {
+public class Resource extends BaseEntity {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "resource_team_id")
@@ -51,20 +55,4 @@ public class Resource extends BaseAggregateRootEntity<Resource> {
     private LocalDate employeeStartDate;
 
     private LocalDate employeeEndDate;
-
-    public static Resource create(String id, String username, String firstName, String lastName, String employeeId, LocalDate employeeStartDate){
-        var resource = new Resource();
-        resource.setId(id);
-        resource.setUsername(username);
-        resource.setFirstName(firstName);
-        resource.setLastName(lastName);
-        resource.setEmployeeId(employeeId);
-        resource.setEmployeeStartDate(employeeStartDate);
-        return resource;
-    }
-
-    public Resource withTeam(ResourceTeam team){
-        this.setResourceTeam(team);
-        return this;
-    }
 }

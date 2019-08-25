@@ -1,4 +1,4 @@
-package th.co.grouplease.simple.pm.project;
+package th.co.grouplease.simple.pm.project.domain.model;
 
 public enum ProjectStatus {
     TODO,

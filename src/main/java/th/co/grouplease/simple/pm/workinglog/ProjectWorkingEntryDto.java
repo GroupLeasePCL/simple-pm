@@ -1,6 +1,7 @@
 package th.co.grouplease.simple.pm.workinglog;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import th.co.grouplease.simple.pm.workinglog.domain.model.TypeOfWork;
 
 import java.time.LocalDate;
 
@@ -12,7 +13,7 @@ public interface ProjectWorkingEntryDto {
     LocalDate getWorkingDate();
 
     interface LightProject {
-        Long getId();
+        String getId();
         String getName();
     }
 

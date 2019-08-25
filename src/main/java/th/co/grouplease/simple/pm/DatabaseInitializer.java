@@ -1,23 +1,21 @@
 package th.co.grouplease.simple.pm;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import th.co.grouplease.simple.pm.product.command.CreateProductCommand;
-import th.co.grouplease.simple.pm.product.command.CreateProductReleaseCommand;
+import th.co.grouplease.simple.pm.product.domain.model.Product;
+import th.co.grouplease.simple.pm.product.domain.model.ProductRelease;
+import th.co.grouplease.simple.pm.product.repository.ProductReleaseRepository;
 import th.co.grouplease.simple.pm.product.repository.ProductRepository;
-import th.co.grouplease.simple.pm.product.service.ProductService;
-import th.co.grouplease.simple.pm.project.Project;
-import th.co.grouplease.simple.pm.project.ProjectRepository;
-import th.co.grouplease.simple.pm.resource.Resource;
-import th.co.grouplease.simple.pm.resource.ResourceRepository;
-import th.co.grouplease.simple.pm.resource.ResourceTeam;
-import th.co.grouplease.simple.pm.resource.ResourceTeamRepository;
-import th.co.grouplease.simple.pm.workinglog.TypeOfWork;
-import th.co.grouplease.simple.pm.workinglog.WorkingEntry;
-import th.co.grouplease.simple.pm.workinglog.WorkingEntryRepository;
+import th.co.grouplease.simple.pm.project.command.CreateProjectCommand;
+import th.co.grouplease.simple.pm.project.service.ProjectService;
+import th.co.grouplease.simple.pm.resource.domain.model.Resource;
+import th.co.grouplease.simple.pm.resource.repository.ResourceRepository;
+import th.co.grouplease.simple.pm.resource.domain.model.ResourceTeam;
+import th.co.grouplease.simple.pm.resource.repository.ResourceTeamRepository;
+import th.co.grouplease.simple.pm.workinglog.domain.model.TypeOfWork;
+import th.co.grouplease.simple.pm.workinglog.domain.model.WorkingEntry;
+import th.co.grouplease.simple.pm.workinglog.repository.WorkingEntryRepository;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -25,9 +23,11 @@ import java.util.UUID;
 @Component
 public class DatabaseInitializer implements CommandLineRunner {
     @Autowired
-    private ProductService productService;
+    private ProductRepository productRepository;
     @Autowired
-    private ProjectRepository projectRepository;
+    private ProductReleaseRepository productReleaseRepository;
+    @Autowired
+    private ProjectService projectService;
     @Autowired
     private ResourceTeamRepository resourceTeamRepository;
     @Autowired
@@ -36,75 +36,65 @@ public class DatabaseInitializer implements CommandLineRunner {
     private WorkingEntryRepository workingEntryRepository;
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         // Initialize products and releases
-        var productGL = productService.createProduct(
-                new CreateProductCommand(UUID.randomUUID().toString(), "GL", LocalDate.of(2000, 1, 1), null));
-        var productTels = productService.createProduct(
-                new CreateProductCommand(UUID.randomUUID().toString(), "Tels", LocalDate.of(2005, 1, 1), null));
-        var productFinWiz = productService.createProduct(
-                new CreateProductCommand(UUID.randomUUID().toString(), "FinWiz", LocalDate.of(2018, 9, 1), null));
+        var productGL = productRepository.save(
+                new Product("GL", LocalDate.of(2000, 1, 1), null));
+        var productTels = productRepository.save(
+                new Product("Tels", LocalDate.of(2005, 1, 1), null));
+        var productFinWiz = productRepository.save(
+                new Product("FinWiz", LocalDate.of(2018, 9, 1), null));
 
-        productService.createProductRelease(
-                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productGL.getId(), "2.5.0", LocalDate.of(2019, 1, 1)));
-        productService.createProductRelease(
-                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productGL.getId(), "2.5.1", LocalDate.of(2019, 2, 1)));
+        productReleaseRepository.save(
+                new ProductRelease(productGL, "2.5.0", LocalDate.of(2019, 1, 1)));
+        productReleaseRepository.save(
+                new ProductRelease(productGL, "2.5.1", LocalDate.of(2019, 2, 1)));
 
-        productService.createProductRelease(
-                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productTels.getId(), "2.0.0", LocalDate.of(2019, 1, 1)));
-        productService.createProductRelease(
-                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productTels.getId(), "2.0.1", LocalDate.of(2019, 2, 1)));
+        productReleaseRepository.save(
+                new ProductRelease(productTels, "2.0.0", LocalDate.of(2019, 1, 1)));
+        productReleaseRepository.save(
+                new ProductRelease(productTels, "2.0.1", LocalDate.of(2019, 2, 1)));
 
-        productService.createProductRelease(
-                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productFinWiz.getId(), "1.0.0", LocalDate.of(2019, 1, 1)));
-        productService.createProductRelease(
-                new CreateProductReleaseCommand(UUID.randomUUID().toString(), productFinWiz.getId(), "1.1.0", LocalDate.of(2019, 2, 1)));
+        productReleaseRepository.save(
+                new ProductRelease(productFinWiz, "1.0.0", LocalDate.of(2019, 1, 1)));
+        productReleaseRepository.save(
+                new ProductRelease(productFinWiz, "1.1.0", LocalDate.of(2019, 2, 1)));
 
         // Initialize projects
-        var revampCollectionProject = Project.create(UUID.randomUUID().toString(), "Revamp collection")
-                .withProduct(productFinWiz);
-        var revampCustodianProject = Project.create(UUID.randomUUID().toString(), "Revamp custodian")
-                .withProduct(productFinWiz);
-        projectRepository.save(revampCollectionProject);
-        projectRepository.save(revampCustodianProject);
-
-        var pdpaProject = Project.create(UUID.randomUUID().toString(), "Privacy data protection act");
-        projectRepository.save(pdpaProject);
+        var revampCollectionProject = projectService.createProject(new CreateProjectCommand(UUID.randomUUID().toString(), "Revamp collection", productFinWiz.getId()));
+        var revampCustodianProject = projectService.createProject(new CreateProjectCommand(UUID.randomUUID().toString(), "Revamp custodian", productFinWiz.getId()));
+        var pdpaProject = projectService.createProject(new CreateProjectCommand(UUID.randomUUID().toString(), "Privacy data protection act", null));
 
         // Initialize resources and teams
-        var softwareDevelopmentTeam = ResourceTeam.create(UUID.randomUUID().toString(), "Software development");
+        var softwareDevelopmentTeam = new ResourceTeam("Software development");
         resourceTeamRepository.save(softwareDevelopmentTeam);
-        var atip = Resource.create(UUID.randomUUID().toString(), "atip", "Atip", "Choowisetwanitch", "44428", LocalDate.of(2018, 1, 1))
-                .withTeam(softwareDevelopmentTeam);
-        var suchawadee = Resource.create(UUID.randomUUID().toString(), "suchawadee", "Suchawadee", "Sinma", "53773", LocalDate.of(2017, 1, 1))
-                .withTeam(softwareDevelopmentTeam);
+        var atip = new Resource(softwareDevelopmentTeam, "atip", "Atip", "Choowisetwanitch",
+                "44428", LocalDate.of(2018, 1, 1), null);
+        var suchawadee = new Resource(softwareDevelopmentTeam, "suchawadee", "Suchawadee", "Sinma",
+                "53773", LocalDate.of(2017, 1, 1), null);
         resourceRepository.save(atip);
         resourceRepository.save(suchawadee);
 
-        var govTeam = ResourceTeam.create(UUID.randomUUID().toString(), "Governance");
+        var govTeam = new ResourceTeam("Governance");
         resourceTeamRepository.save(govTeam);
-        var endoo = Resource.create(UUID.randomUUID().toString(), "endoo", "Endoo", "Akarum", "64345", LocalDate.of(2018, 1, 1))
-                .withTeam(govTeam);
+        var endoo = new Resource(govTeam, "endoo", "Endoo", "Akarum",
+                "64345", LocalDate.of(2018, 1, 1), null);
         resourceRepository.save(endoo);
 
         // Initialize working entries
-        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), atip, TypeOfWork.PROJECT,
-                LocalDate.of(2019, 1, 1))
-                .withProject(revampCollectionProject));
+        workingEntryRepository.save(new WorkingEntry(atip, TypeOfWork.PROJECT, revampCollectionProject, null,
+                LocalDate.of(2019, 1, 1)));
 
-        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), suchawadee, TypeOfWork.PROJECT,
-                LocalDate.of(2019, 1, 1))
-                .withProject(revampCollectionProject));
+        workingEntryRepository.save(new WorkingEntry(suchawadee, TypeOfWork.PROJECT, revampCollectionProject, null,
+                LocalDate.of(2019, 1, 1)));
 
-        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), endoo, TypeOfWork.PROJECT,
-                LocalDate.of(2019, 1, 1))
-                .withProject(pdpaProject));
+        workingEntryRepository.save(new WorkingEntry(endoo, TypeOfWork.PROJECT, pdpaProject, null,
+                LocalDate.of(2019, 1, 1)));
 
-        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), atip, TypeOfWork.PROJECT,
-                LocalDate.of(2019, 1, 2))
-                .withProject(revampCustodianProject));
+        workingEntryRepository.save(new WorkingEntry(atip, TypeOfWork.PROJECT, revampCustodianProject, null,
+                LocalDate.of(2019, 1, 2)));
 
-        workingEntryRepository.save(WorkingEntry.create(UUID.randomUUID().toString(), suchawadee, TypeOfWork.SUPPORT,
+        workingEntryRepository.save(new WorkingEntry(suchawadee, TypeOfWork.SUPPORT, null, null,
                 LocalDate.of(2019, 1, 2)));
     }
 }

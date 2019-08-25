@@ -6,6 +6,8 @@ import javax.validation.constraints.NotNull;
 
 @Value
 public class ChangeProjectNameCommand {
+    @NotNull
+    private String id;
     @NotNull(message = "Name cannot be null")
     private String name;
 }

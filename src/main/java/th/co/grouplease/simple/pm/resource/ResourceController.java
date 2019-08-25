@@ -7,8 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import th.co.grouplease.simple.pm.workinglog.WorkingEntry;
-import th.co.grouplease.simple.pm.workinglog.WorkingEntryRepository;
+import th.co.grouplease.simple.pm.resource.domain.model.Resource;
+import th.co.grouplease.simple.pm.resource.repository.ResourceRepository;
+import th.co.grouplease.simple.pm.workinglog.domain.model.WorkingEntry;
+import th.co.grouplease.simple.pm.workinglog.repository.WorkingEntryRepository;
 
 import javax.validation.constraints.Min;
 
@@ -33,7 +35,7 @@ public class ResourceController {
     }
 
     @GetMapping("/{resourceId}/working-entries")
-    public Page<WorkingEntry> getAllWorkingEntriesByResource(@PathVariable String resourceId,
+    public Page<WorkingEntry> getAllWorkingEntriesByResource(@PathVariable Long resourceId,
                                                              @RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
                                                              @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
         return workingEntryRepository.findAllByResource(
@@ -44,7 +46,7 @@ public class ResourceController {
     }
 
     @GetMapping("/{resourceId}/working-entries/count")
-    public Long getWorkingEntryCountByResource(@PathVariable String resourceId){
+    public Long getWorkingEntryCountByResource(@PathVariable Long resourceId){
         return workingEntryRepository.countAllByResource(resourceRepository.findById(resourceId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }

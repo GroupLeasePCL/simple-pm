@@ -1,15 +1,17 @@
-package th.co.grouplease.simple.pm.workinglog;
+package th.co.grouplease.simple.pm.workinglog.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
+import th.co.grouplease.simple.pm.common.BaseEntity;
 import th.co.grouplease.simple.pm.product.domain.model.ProductRelease;
-import th.co.grouplease.simple.pm.project.Project;
-import th.co.grouplease.simple.pm.resource.Resource;
+import th.co.grouplease.simple.pm.project.domain.model.Project;
+import th.co.grouplease.simple.pm.resource.domain.model.Resource;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -17,6 +19,8 @@ import java.time.LocalDate;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 @Entity(name = "WorkingEntry")
 @Table(name = "working_entry")
 @SQLDelete(sql =
@@ -31,7 +35,7 @@ import java.time.LocalDate;
                 "    w.id = ?1 AND " +
                 "    w.deleted = false")
 @Where(clause = "deleted = false")
-public class WorkingEntry extends BaseAggregateRootEntity<WorkingEntry> {
+public class WorkingEntry extends BaseEntity {
     @JsonIgnore
     @NotNull(message = "Resource cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,18 +59,4 @@ public class WorkingEntry extends BaseAggregateRootEntity<WorkingEntry> {
 
     @NotNull(message = "Working date cannot be null")
     private LocalDate workingDate;
-
-    public static WorkingEntry create(String id, Resource resource, TypeOfWork typeOfWork, LocalDate workingDate){
-        var result = new WorkingEntry();
-        result.setId(id);
-        result.setResource(resource);
-        result.setTypeOfWork(typeOfWork);
-        result.setWorkingDate(workingDate);
-        return result;
-    }
-
-    public WorkingEntry withProject(Project project){
-        this.setProject(project);
-        return this;
-    }
 }
