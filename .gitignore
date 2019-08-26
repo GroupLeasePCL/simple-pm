@@ -30,3 +30,7 @@ target/
 *.iws
 *.iml
 *.ipr
+
+*/node_modules/
+webpack.config.js
+webpack.generated.js
