@@ -82,16 +82,16 @@ public class DatabaseInitializer implements CommandLineRunner {
         resourceRepository.save(endoo);
 
         // Initialize working entries
-        workingEntryRepository.save(new WorkingEntry(atip, TypeOfWork.PROJECT, revampCollectionProject, null,
+        workingEntryRepository.save(new WorkingEntry(atip, TypeOfWork.PROJECT, revampCollectionProject.getId(), null,
                 LocalDate.of(2019, 1, 1)));
 
-        workingEntryRepository.save(new WorkingEntry(suchawadee, TypeOfWork.PROJECT, revampCollectionProject, null,
+        workingEntryRepository.save(new WorkingEntry(suchawadee, TypeOfWork.PROJECT, revampCollectionProject.getId(), null,
                 LocalDate.of(2019, 1, 1)));
 
-        workingEntryRepository.save(new WorkingEntry(endoo, TypeOfWork.PROJECT, pdpaProject, null,
+        workingEntryRepository.save(new WorkingEntry(endoo, TypeOfWork.PROJECT, pdpaProject.getId(), null,
                 LocalDate.of(2019, 1, 1)));
 
-        workingEntryRepository.save(new WorkingEntry(atip, TypeOfWork.PROJECT, revampCustodianProject, null,
+        workingEntryRepository.save(new WorkingEntry(atip, TypeOfWork.PROJECT, revampCustodianProject.getId(), null,
                 LocalDate.of(2019, 1, 2)));
 
         workingEntryRepository.save(new WorkingEntry(suchawadee, TypeOfWork.SUPPORT, null, null,

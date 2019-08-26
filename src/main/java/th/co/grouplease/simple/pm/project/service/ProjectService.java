@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import th.co.grouplease.simple.pm.product.repository.ProductRepository;
 import th.co.grouplease.simple.pm.project.command.CreateProjectCommand;
 import th.co.grouplease.simple.pm.project.command.DeleteProjectCommand;
+import th.co.grouplease.simple.pm.project.command.StartProjectCommand;
 import th.co.grouplease.simple.pm.project.domain.model.Project;
 import th.co.grouplease.simple.pm.project.repository.ProjectRepository;
 
@@ -16,18 +16,10 @@ import javax.transaction.Transactional;
 public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
-    @Autowired
-    private ProductRepository productRepository;
 
     @Transactional
     public Project createProject(CreateProjectCommand command){
-        if(command.getProductId() != null){
-            var product = productRepository.findById(command.getProductId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-            return projectRepository.save(new Project(command, product));
-        } else {
-            return projectRepository.save(new Project(command, null));
-        }
+        return projectRepository.save(new Project(command));
     }
 
     @Transactional
@@ -35,6 +27,14 @@ public class ProjectService {
         var project = projectRepository.findById(command.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         project.markDeleted(command);
+        projectRepository.save(project);
+    }
+
+    @Transactional
+    public void startProject(StartProjectCommand command){
+        var project = projectRepository.findById(command.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        project.start(command);
         projectRepository.save(project);
     }
 }

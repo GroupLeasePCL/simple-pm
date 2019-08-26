@@ -1,6 +1,5 @@
 package th.co.grouplease.simple.pm.project.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,15 +7,15 @@ import org.hibernate.annotations.Loader;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import th.co.grouplease.simple.pm.common.BaseAggregateRootEntity;
-import th.co.grouplease.simple.pm.product.domain.model.Product;
 import th.co.grouplease.simple.pm.project.command.CreateProjectCommand;
 import th.co.grouplease.simple.pm.project.command.DeleteProjectCommand;
+import th.co.grouplease.simple.pm.project.command.StartProjectCommand;
 import th.co.grouplease.simple.pm.project.event.ProjectCreatedEvent;
 import th.co.grouplease.simple.pm.project.event.ProjectDeletedEvent;
+import th.co.grouplease.simple.pm.project.event.ProjectStartedEvent;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -37,33 +36,28 @@ import java.time.LocalDate;
 @Where(clause = "deleted = false")
 public class Project extends BaseAggregateRootEntity<Project> {
 
-    @NotNull(message = "Project name cannot be null")
-    private String name;
-    private LocalDate startDate;
-    private LocalDate expectedStartDate;
-    private LocalDate endDate;
-    private LocalDate expectedEndDate;
-
     @NotNull(message = "Project status cannot be null")
     @Enumerated(EnumType.STRING)
     @Column(length = 15)
     private ProjectStatus status;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    public Project(CreateProjectCommand command, Product product){
+    public Project(CreateProjectCommand command){
         setId(command.getId());
-        this.name = command.getName();
         this.status = ProjectStatus.TODO;
-        this.product = product;
         registerEvent(new ProjectCreatedEvent(command.getId(), command.getName(), command.getProductId(), this.status));
     }
 
     public void markDeleted(DeleteProjectCommand command){
         super.markDeleted();
         registerEvent(new ProjectDeletedEvent(command.getId()));
+    }
+
+    public void start(StartProjectCommand command){
+        if(status != ProjectStatus.TODO){
+            throw new IllegalStateException("Cannot start project because it's not in TODO state");
+        } else {
+            status = ProjectStatus.WIP;
+            registerEvent(new ProjectStartedEvent(command.getId(), status));
+        }
     }
 }

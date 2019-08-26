@@ -10,7 +10,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import th.co.grouplease.simple.pm.common.BaseEntity;
 import th.co.grouplease.simple.pm.product.domain.model.ProductRelease;
-import th.co.grouplease.simple.pm.project.domain.model.Project;
 import th.co.grouplease.simple.pm.resource.domain.model.Resource;
 
 import javax.persistence.*;
@@ -47,10 +46,7 @@ public class WorkingEntry extends BaseEntity {
     @Column(length = 15)
     private TypeOfWork typeOfWork;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "project_id")
-    private Project project;
+    private String projectId;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

@@ -11,8 +11,8 @@ import th.co.grouplease.simple.pm.product.domain.model.Product;
 import th.co.grouplease.simple.pm.product.domain.model.ProductRelease;
 import th.co.grouplease.simple.pm.product.repository.ProductReleaseRepository;
 import th.co.grouplease.simple.pm.product.repository.ProductRepository;
-import th.co.grouplease.simple.pm.project.domain.model.Project;
-import th.co.grouplease.simple.pm.project.repository.ProjectRepository;
+import th.co.grouplease.simple.pm.project.read.model.ProjectEntry;
+import th.co.grouplease.simple.pm.project.repository.ProjectEntryRepository;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -26,7 +26,7 @@ public class ProductController {
     @Autowired
     private ProductReleaseRepository productReleaseRepository;
     @Autowired
-    private ProjectRepository projectRepository;
+    private ProjectEntryRepository projectEntryRepository;
 
     // product endpoints
     @GetMapping(path = "/products")
@@ -140,10 +140,10 @@ public class ProductController {
 
     // project endpoints
     @GetMapping(path = "/products/{productId}/projects")
-    public Page<Project> getAllProjectsForProduct(@PathVariable Long productId,
-                                                  @RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
-                                                  @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
-        return projectRepository.findAllByProduct(
+    public Page<ProjectEntry> getAllProjectsForProduct(@PathVariable Long productId,
+                                                       @RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
+                                                       @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
+        return projectEntryRepository.findAllByProduct(
                 productRepository.findById(productId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
                 PageRequest.of(page, pageSize)
@@ -152,7 +152,7 @@ public class ProductController {
 
     @GetMapping(path = "/products/{productId}/projects/count")
     public Long getProjectCountForProduct(@PathVariable Long productId){
-        return projectRepository.countAllByProduct(
+        return projectEntryRepository.countAllByProduct(
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND))
