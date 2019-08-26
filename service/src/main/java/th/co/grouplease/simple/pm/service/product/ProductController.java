@@ -108,15 +108,15 @@ public class ProductController {
     }
 
     @GetMapping(path = "/products/{productId}/releases")
-    public Page<ProductRelease> getAllReleasesForProduct(@PathVariable Long productId,
-                                                         @RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
-                                                         @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
+    public List<ProductRelease> getAllReleasesForProduct(@PathVariable Long productId,
+                                                         @RequestParam @Min(value = 0, message = "offset be at least 0") long offset,
+                                                         @RequestParam @Min(value = 1, message = "limit must be at least 1") int limit){
         return productReleaseRepository.findAllByProduct(
                 productRepository
                         .findById(productId)
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)),
-                PageRequest.of(page, pageSize)
-        );
+                new OffsetBasedPageRequest(offset, limit)
+        ).getContent();
     }
 
     @GetMapping(path = "/products/{productId}/releases/count")

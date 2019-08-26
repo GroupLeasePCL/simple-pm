@@ -12,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route
 @PWA(name = "Simple Project Management Tool", shortName = "PM")
 public class MainView extends VerticalLayout {
-
-    public MainView(@Autowired ProductService productService) {
+    @Autowired
+    public MainView(ProductService productService) {
         add(new H2("Products"));
         var productGrid = new Grid<>(Product.class);
         CallbackDataProvider<Product, Void> productDataProvider = DataProvider
