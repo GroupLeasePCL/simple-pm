@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import th.co.grouplease.simple.pm.service.common.OffsetBasedPageRequest;
 import th.co.grouplease.simple.pm.service.product.domain.model.Product;
 import th.co.grouplease.simple.pm.service.product.domain.model.ProductRelease;
 import th.co.grouplease.simple.pm.service.product.repository.ProductReleaseRepository;
@@ -16,6 +17,7 @@ import th.co.grouplease.simple.pm.service.project.repository.ProjectEntryReposit
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import java.util.List;
 
 @RestController
 @Validated
@@ -30,9 +32,9 @@ public class ProductController {
 
     // product endpoints
     @GetMapping(path = "/products")
-    public Page<Product> getAllProducts(@RequestParam @Min(value = 0, message = "Page must be at least 0") int page,
-                                        @RequestParam @Min(value = 1, message = "Page size must be at least 1") int pageSize){
-        return productRepository.findAll(PageRequest.of(page, pageSize));
+    public List<Product> getAllProducts(@RequestParam @Min(value = 0, message = "offset be at least 0") long offset,
+                                        @RequestParam @Min(value = 1, message = "limit must be at least 1") int limit){
+        return productRepository.findAll(new OffsetBasedPageRequest(offset, limit)).getContent();
     }
 
     @PostMapping(path = "/products")
