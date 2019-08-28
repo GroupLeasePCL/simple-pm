@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.Optional;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
@@ -31,16 +30,16 @@ public class BaseEntity {
         this.id = id;
     }
 
-    public Optional<LocalDateTime> getCreatedDate() {
-        return null == this.createdDate ? Optional.empty() : Optional.of(LocalDateTime.ofInstant(this.createdDate.toInstant(), ZoneId.systemDefault()));
+    public LocalDateTime getCreatedDate() {
+        return null == this.createdDate ? null : LocalDateTime.ofInstant(this.createdDate.toInstant(), ZoneId.systemDefault());
     }
 
     public void setCreatedDate(LocalDateTime createdDate) {
         this.createdDate = Date.from(createdDate.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    public Optional<LocalDateTime> getLastModifiedDate() {
-        return null == this.lastModifiedDate ? Optional.empty() : Optional.of(LocalDateTime.ofInstant(this.lastModifiedDate.toInstant(), ZoneId.systemDefault()));
+    public LocalDateTime getLastModifiedDate() {
+        return null == this.lastModifiedDate ? null : LocalDateTime.ofInstant(this.lastModifiedDate.toInstant(), ZoneId.systemDefault());
     }
 
     public void setLastModifiedDate(LocalDateTime lastModifiedDate) {

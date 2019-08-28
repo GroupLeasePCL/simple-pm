@@ -22,29 +22,30 @@ import th.co.grouplease.simple.pm.ui.model.Product;
 import th.co.grouplease.simple.pm.ui.model.ProductRelease;
 import th.co.grouplease.simple.pm.ui.service.ProductService;
 
-@Route
+@Route("")
 @PWA(name = "Simple Project Management Tool", shortName = "PM")
-public class MainView extends VerticalLayout {
-    private final Logger logger = LoggerFactory.getLogger(MainView.class);
+public class ProductView extends VerticalLayout {
+    private final Logger logger = LoggerFactory.getLogger(ProductView.class);
 
     @Autowired
-    public MainView(ProductService productService, ProductReleaseDataProvider productReleaseDataProvider) {
+    public ProductView(ProductService productService, ProductReleaseDataProvider productReleaseDataProvider) {
         configureProductGrid(productService, productReleaseDataProvider);
         configureProductReleaseGrid(productReleaseDataProvider);
     }
 
     private void configureProductGrid(ProductService productService, ProductReleaseDataProvider productReleaseDataProvider) {
         add(new H2("Products"));
-        var productGrid = new Grid<>(Product.class);
-        productGrid.setColumns("name", "productStartDate", "productEndDate");
-        productGrid.setWidthFull();
-
         var horizontalLayout = new HorizontalLayout();
-        horizontalLayout.add(productGrid);
         horizontalLayout.setWidthFull();
         add(horizontalLayout);
 
+        var productGrid = new Grid<>(Product.class);
+        productGrid.setWidthFull();
+        productGrid.setColumns("name", "productStartDate", "productEndDate");
+        horizontalLayout.add(productGrid);
+
         FormLayout productFormLayout = new FormLayout();
+        productFormLayout.setWidthFull();
         var nameTextField = new TextField("Name");
         var productStartDateField = new DatePicker("Product start date");
         var productEndDateField = new DatePicker("Product end date");
@@ -54,8 +55,13 @@ public class MainView extends VerticalLayout {
         productFormLayout.add(nameTextField);
         productFormLayout.add(productStartDateField);
         productFormLayout.add(productEndDateField);
-        productFormLayout.add(createProductButton);
-        horizontalLayout.add(productFormLayout);
+
+        // Wrap form and button in vertical layout
+        var rootFormLayout = new VerticalLayout();
+        rootFormLayout.setWidthFull();
+        horizontalLayout.add(rootFormLayout);
+        rootFormLayout.add(productFormLayout);
+        rootFormLayout.add(createProductButton);
 
         // Add data binder
         var productDataBinder = new BeanValidationBinder<>(Product.class);
@@ -95,14 +101,33 @@ public class MainView extends VerticalLayout {
 
     private void configureProductReleaseGrid(ProductReleaseDataProvider productReleaseDataProvider) {
         add(new H2("Product Releases"));
-        var productReleaseGrid = new Grid<>(ProductRelease.class);
-        productReleaseGrid.setColumns("version", "releaseDate");
-        productReleaseGrid.setDataProvider(productReleaseDataProvider);
-
         var horizontalLayout = new HorizontalLayout();
         horizontalLayout.setWidthFull();
-        horizontalLayout.add(productReleaseGrid);
         add(horizontalLayout);
+
+        var productReleaseGrid = new Grid<>(ProductRelease.class);
+        productReleaseGrid.setWidthFull();
+        productReleaseGrid.setColumns("version", "releaseDate");
+        productReleaseGrid.setDataProvider(productReleaseDataProvider);
+        horizontalLayout.add(productReleaseGrid);
+
+        FormLayout productFormLayout = new FormLayout();
+        productFormLayout.setWidthFull();
+        var versionTextField = new TextField("Version");
+        var releaseDateField = new DatePicker("Release date");
+
+        productFormLayout.add(versionTextField);
+        productFormLayout.add(releaseDateField);
+
+        var createProductButton = new Button("Create");
+        createProductButton.setEnabled(false);
+
+        // Wrap form and button in vertical layout
+        var rootFormLayout = new VerticalLayout();
+        rootFormLayout.setWidthFull();
+        horizontalLayout.add(rootFormLayout);
+        rootFormLayout.add(productFormLayout);
+        rootFormLayout.add(createProductButton);
     }
 
 }

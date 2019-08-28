@@ -1,27 +1,14 @@
 package th.co.grouplease.simple.pm.ui.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductRelease {
-    private Long id;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
+public class ProductRelease extends BaseModel<Long> {
     private String version;
     private LocalDate releaseDate;
-
-    public static ProductRelease create(Long id, String version, LocalDate releaseDate){
-        var result = new ProductRelease();
-        result.id = id;
-        result.version = version;
-        result.releaseDate = releaseDate;
-        return result;
-    }
 }

@@ -1,24 +1,16 @@
 package th.co.grouplease.simple.pm.ui.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class Product implements Serializable {
-    private Long id;
-    private LocalDateTime createdDate;
-    private LocalDateTime lastModifiedDate;
+public class Product extends BaseModel<Long> {
     @NotEmpty
     private String name;
     @NotNull
