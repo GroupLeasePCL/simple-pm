@@ -14,8 +14,6 @@ import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import th.co.grouplease.simple.pm.ui.dataprovider.ProductReleaseDataProvider;
 import th.co.grouplease.simple.pm.ui.model.Product;
@@ -25,10 +23,8 @@ import th.co.grouplease.simple.pm.ui.service.ProductService;
 @Route("")
 @PWA(name = "Simple Project Management Tool", shortName = "PM")
 public class ProductView extends VerticalLayout {
-    private final Logger logger = LoggerFactory.getLogger(ProductView.class);
 
-    @Autowired
-    public ProductView(ProductService productService, ProductReleaseDataProvider productReleaseDataProvider) {
+    public ProductView(@Autowired ProductService productService, @Autowired ProductReleaseDataProvider productReleaseDataProvider) {
         configureProductGrid(productService, productReleaseDataProvider);
         configureProductReleaseGrid(productReleaseDataProvider);
     }
@@ -51,6 +47,7 @@ public class ProductView extends VerticalLayout {
         var productEndDateField = new DatePicker("Product end date");
         var createProductButton = new Button("Create");
         createProductButton.setEnabled(false);
+        createProductButton.setDisableOnClick(true);
 
         productFormLayout.add(nameTextField);
         productFormLayout.add(productStartDateField);
@@ -71,8 +68,8 @@ public class ProductView extends VerticalLayout {
         productDataBinder.setBean(new Product());
 
         // Add create listener
-        productDataBinder.addStatusChangeListener(statusChangeEvent ->
-                createProductButton.setEnabled(!statusChangeEvent.hasValidationErrors()));
+        productDataBinder.addStatusChangeListener(statusChangeEvent -> createProductButton.setEnabled(statusChangeEvent.getBinder().isValid()));
+
 
         CallbackDataProvider<Product, Void> productDataProvider = DataProvider
                 .fromCallbacks(query -> productService.getProducts(query.getOffset(), query.getLimit()).stream(),
