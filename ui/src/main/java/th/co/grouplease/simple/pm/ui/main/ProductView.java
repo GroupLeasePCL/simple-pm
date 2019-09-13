@@ -15,6 +15,7 @@ import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.PWA;
 import org.springframework.beans.factory.annotation.Autowired;
+import th.co.grouplease.simple.pm.ui.component.PMMenuBar;
 import th.co.grouplease.simple.pm.ui.dataprovider.ProductReleaseDataProvider;
 import th.co.grouplease.simple.pm.ui.model.Product;
 import th.co.grouplease.simple.pm.ui.model.ProductRelease;
@@ -25,6 +26,7 @@ import th.co.grouplease.simple.pm.ui.service.ProductService;
 public class ProductView extends VerticalLayout {
 
     public ProductView(@Autowired ProductService productService, @Autowired ProductReleaseDataProvider productReleaseDataProvider) {
+        add(new PMMenuBar());
         configureProductGrid(productService, productReleaseDataProvider);
         configureProductReleaseGrid(productReleaseDataProvider);
     }
