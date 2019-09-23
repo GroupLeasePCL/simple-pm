@@ -13,6 +13,7 @@ import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.provider.CallbackDataProvider;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.router.Route;
+
 import com.vaadin.flow.server.PWA;
 import org.springframework.beans.factory.annotation.Autowired;
 import th.co.grouplease.simple.pm.ui.component.PMMenuBar;
@@ -21,7 +22,7 @@ import th.co.grouplease.simple.pm.ui.model.Product;
 import th.co.grouplease.simple.pm.ui.model.ProductRelease;
 import th.co.grouplease.simple.pm.ui.service.ProductService;
 
-@Route("")
+@Route("product")
 @PWA(name = "Simple Project Management Tool", shortName = "PM")
 public class ProductView extends VerticalLayout {
 

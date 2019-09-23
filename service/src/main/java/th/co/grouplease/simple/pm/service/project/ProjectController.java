@@ -45,18 +45,19 @@ public class ProjectController {
         projectService.deleteProject(new DeleteProjectCommand(projectId));
     }
 
-    @GetMapping
+    @GetMapping(produces = "application/project+json") //produces = HttpHeaders (example Project Service)
     public List<ProjectEntry> getAllProjects(@RequestParam @Min(value = 0, message = "offset be at least 0") long offset,
                                              @RequestParam @Min(value = 1, message = "limit must be at least 1") int limit){
-        //return projectEntryRepository.findAll(PageRequest.of(page, pageSize));
         return projectEntryRepository.findAll(new OffsetBasedPageRequest(offset, limit)).getContent();
     }
 
-    @GetMapping(produces = "application/product-name-only+json")
-    public Page<ProjectNameDto> getAllProjectNames(@RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
+
+    @GetMapping(produces = "application/project-name-only+json")
+    public List<ProjectNameDto> getAllProjectNames(@RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
                                                    @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
-        return projectEntryRepository.findAllProjectedBy(ProjectNameDto.class, PageRequest.of(page, pageSize));
+        return projectEntryRepository.findAllProjectedBy(ProjectNameDto.class, PageRequest.of(page, pageSize)).getContent();
     }
+
 
     @GetMapping(path = "/count")
     public Long getCount(){
