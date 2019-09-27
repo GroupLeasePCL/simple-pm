@@ -15,7 +15,5 @@ public class PMMenuBar extends MenuBar {
         SubMenu m2Resource = m1Resource.getSubMenu();
         MenuItem m2ResourceTeam = m2Resource.addItem("Resource Team");
         MenuItem m2ResourceAll = m2Resource.addItem("Resource All");
-
-
     }
 }

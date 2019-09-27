@@ -25,7 +25,7 @@ public class ResourceController {
 
     @GetMapping
     public Page<Resource> getAllResources(@RequestParam @Min(value = 0, message = "Page must be at least 0") Integer page,
-                                          @RequestParam @Min(value = 1, message = "Page size must be at least s1") Integer pageSize){
+                                          @RequestParam @Min(value = 1, message = "Page size must be at least 1") Integer pageSize){
         return resourceRepository.findAll(PageRequest.of(page, pageSize));
     }
 

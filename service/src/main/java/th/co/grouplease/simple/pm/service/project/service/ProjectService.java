@@ -35,6 +35,7 @@ public class ProjectService {
         var project = projectRepository.findById(command.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         project.start(command);
+
         projectRepository.save(project);
     }
 }

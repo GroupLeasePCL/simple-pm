@@ -48,7 +48,7 @@ public class ProjectEntry extends BaseEntity {
     private ProjectStatus status;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
 }
