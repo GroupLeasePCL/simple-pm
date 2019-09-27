@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import th.co.grouplease.simple.pm.ui.model.ProductRelease;
 import th.co.grouplease.simple.pm.ui.service.ProductReleaseService;
-
 import java.util.stream.Stream;
 
 @Component

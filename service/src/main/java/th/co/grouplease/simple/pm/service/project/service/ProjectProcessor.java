@@ -14,6 +14,7 @@ import th.co.grouplease.simple.pm.service.project.read.model.ProjectEntry;
 import th.co.grouplease.simple.pm.service.project.repository.ProjectEntryRepository;
 
 import javax.transaction.Transactional;
+import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
@@ -55,6 +56,7 @@ public class ProjectProcessor {
         if(optionalProjectEntry.isPresent()){
             ProjectEntry projectEntry = optionalProjectEntry.get();
             projectEntry.setStatus(event.getStatus());
+            projectEntry.setStartDate(LocalDate.now());
             projectEntryRepository.save(projectEntry);
         }
     }
